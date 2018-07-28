@@ -1,0 +1,13 @@
+modules:
+  input:
+    module: wishbone.module.input.generator
+    arguments:
+      payload:
+        data: test_data
+        _id: document
+
+  output:
+    module: wishbone.module.output.elasticsearch
+
+routingtable:
+  - input.outbox -> output.inbox
