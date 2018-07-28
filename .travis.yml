@@ -8,7 +8,7 @@ script:
 - pytest -s -v tests/default.py
 after_success:
 - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-- export REPO=wishbone-modules/wishbone-output-elasticsearch
+- export REPO=smetj/wishbone-output-elasticsearch
 - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH
   ; fi`
 - docker build -f Dockerfile -t $REPO:$TRAVIS_COMMIT --build-arg branch=$TRAVIS_BRANCH
