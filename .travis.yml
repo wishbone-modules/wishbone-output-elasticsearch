@@ -1,0 +1,28 @@
+language: python
+python:
+- '3.6'
+install:
+- python setup.py install
+- pip install pytest
+script:
+- pytest -s -v tests/default.py
+after_success:
+- docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+- export REPO=wishbone-modules/wishbone-output-elasticsearch
+- export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH
+  ; fi`
+- docker build -f Dockerfile -t $REPO:$TRAVIS_COMMIT --build-arg branch=$TRAVIS_BRANCH
+  .
+- docker tag $REPO:$TRAVIS_COMMIT $REPO:$TAG
+- docker tag $REPO:$TRAVIS_COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+- docker push $REPO:$TAG
+- docker push $REPO:$TRAVIS_COMMIT
+notifications:
+  webhooks:
+    urls:
+      - secure: "ENHLeDLu/wTsYdFB2VQR368vXxayZlyIWsZJLYuEVKqOQIUMe9EuLShwk3JMfi90X6VQbivBvrPh9CyY6Py7T/EX4PF6+jKfoH3OhcxsuZCdtxYRT6707qOMCKNuYpIHgAQ5u/B+7mZuoXe5UXRR2j0w0cIIojyXlRGt2PGLPyz1lGAfKYf/kOb9GRLbMqOzrNawyHTJoKTqIESUoYTDtLB8eqK7aWtX0/HVgw7FDhaoJc9ChjEnUH+uLLoBb9LP5QsRVzYEOJMuq+MCT0oK8rX16peXPFVOqM4poylSq9EhDS6E1LRAfyUp37GcT9VPFW3FW98Z7QgJNRQARsZH+V1d8zLLlbnrwzaHoTNj2ea6O5/DClo5Yn8n2FrbfSPg/oet1o5rVT23BgFP5xJlUyU7qT/GAlRLahyFti3X2x/BhP3xPaKc5NqrQExKdp3RzS/HYp4D/K5K4R2bjCOWkoHb1/Q2Mylzm/KwEc8c5EoVgWTBcdA82rsjdU7vFZ+jueVYJj+sN0c17hUsktgb8RojCWm/K3aZF2ixuVZk0O+wfTZOrUW9Avpp3rOLbURuuI74R4f++gNiaP+A3vFUM5SHUHDz4vNzH4xV1TwsjTHnHYQTZIjZawwtxAnA6EaeB6n15OtJajPQ2A9X5JFPrK61UpUutv7ldtSARmoY1XQ="
+    on_success: always
+    on_failure: always
+    on_start: always
+    on_cancel: always
+    on_error: always
